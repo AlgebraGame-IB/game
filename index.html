@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <title>Algebra Quiz</title>
+   <style>
+      .container {
+        background-color: #FFFFFF;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+       background-size: cover;
+      }
+   </style>
+   <style>
+      body {
+       background-image: url('http://fordgallerypdx.com/wp-content/uploads/2019/12/PONTERI_BudsPuddlesMudMoss_30x30_575-1024x1024.jpg');
+       background-color: #0000FF;
+      }
+   </style>
+</head>
+<body>
+   <div class="container">
+      <h1>Algebra Quiz</h1>
+      <div id="question-box">
+         <p id="question">Question: </p>
+         <p>Choose an answer</p>
+      <div id="answers"></div>
+      </div>
+      <div id="score"></div>
+   </div>
+   <script>
+
+         var n1;   //variable for random number between -99 and 99
+         var n2;   //variable for random number between -10 and 10
+         // var answerString = ''; // used for testing
+         var letterAnswers = ['A', 'B', 'C', 'D'];   //an array of letters for the answers to display in the HTML buttons and to set in the correctLetterAnswer variable
+         var randomizedAnswers = [];
+         var questionBox = '';
+         var correctAnswer;    // this var will hold the correct answer
+         var correctLetterAnswer;    // this var will hold letter A, B, C, or D of the correct answer
+         var button = '';      //var to hold the code for the answer buttons
+         var scoreKeeper = document.getElementById('score');   //html element to display correct and incorrect scores
+         var answerElement = document.getElementById('answers');
+         var answerArray = []; // array of objects used to house three wrong answers and one right answer. upon initial build the right answer object is at position 0 with the wrong answer objects following
+         var scoreRight = 0; //sum of right ansers
+         var scoreWrong = 0; //sum of wrong answers
+
+         // --------------------------------------
+
+         // functions to get random non-zero, non number 1 numbers between/including -99 and 99 and -10 and 10
+         // math.random returns a number between 0 and 1, including 0 but not quite 1 to 16 decimal places
+         // multiply that by 199 and you get a random number bwtween 0 and 199 to 16 decimal places.
+         // wrap that number in math.floor and it rounds down to a whole number and now you have an integer between 0 and 99
+         // subtract 99 from that number and you'll have a random number between -99 and 99.
+         function getNonZeroNon1RandomNumber99(){
+            var random = Math.floor(Math.random()*199) - 99;
+            if(random==0) {
+               return getNonZeroNon1RandomNumber99()   // we don't want a zero (div by zero is bad), so if a random 0 gets returned try again.
+            } else if (random==1) {
+               return getNonZeroNon1RandomNumber99()   // we don't want a 1 -- too easy. try again.
+            }
+               return random;
+         }
+         // same method as above but we limit the randoms to -10 to 10
+         function getNonZeroNon1RandomNumber10(){
+            var random = Math.floor(Math.random()*20) - 10;
+            if(random==0){
+               return getNonZeroNon1RandomNumber10()
+            } else if (random==1) {
+               return getNonZeroNon1RandomNumber10()
+            }
+               return random;
+         }
+
+         // this function does most of the work in the app.
+         // we generate the problem string to display on the web page by randomly selecting one of several problem types.
+         // we also solve the problems with a little algebra
+         // we also generate wrong answers to display next to the right one.
+         // we build buttons with the wrong and right answers and take note of which one is the right answer.
+         // we build event listeners to listen for button clicks
+         //
+         // we call the evaluate function to see if the button that was clicked contains the correct answer.
+
+
+         function generateProblem(){
+            button = '';
+            randomizedAnswers = [];
+
+                                       // set n1 and n2 variables. n1 = random between -100 and 100. n2 = random between -10 and 10
+            n1 = getNonZeroNon1RandomNumber99() ;
+            n2 = getNonZeroNon1RandomNumber10() ;
+                                       //console.log('N1: ' + n1 + ', N2: ' + n2);
+
+                                       // generate random integer to select problem type based on 5 problem types
+            var problemType = Math.floor(Math.random()*3);
+                                       //console.log('ProbType: ' + problemType);
+
+                                       // Build problem type if statement with with algorithm and print information
+                                       // display problem type with n1 and n2
+                                       // solve algebraic problem
+                                       // Save correct answer to var
+                                       // build object with answers
+
+            if (problemType == 0) {
+                                       //console.log('problem type 0: ' + n1 + ' * x = ' + n2);
+               var c = n1 * n2
+               problemString = n1 + ' * X = ' + c;
+               correctAnswer = (n2);
+               answerArray.push({      // create a right answer object in the answer array. see answerArray notes above.
+                     correct: true,    // this object element tells us that this is the correct answer.
+                     value: correctAnswer
+               });
+                                       //console.log('correct answer: ' + correctAnswer);
+            }
+
+            if (problemType == 1) {
+                                       //console.log('problem type 1: ' + n1 + ' / x = ' + n2);
+               problemString = n1 + ' / X = ' + n2;
+               correctAnswer = (n1*n2);
+               answerArray.push({
+                     correct: true,
+                     value: correctAnswer
+               });
+                                       //console.log('correct answer: ' + correctAnswer);
+            }
+
+            if (problemType == 2) {
+                                       //console.log('problem type 2: ' + n1 + ' + x = ' + n2);
+               problemString = n1 + ' + X = ' + n2;
+               correctAnswer = n2 - n1;
+               answerArray.push({
+                     correct: true,
+                     value: correctAnswer
+               });
+                                       //console.log('correct answer: ' + correctAnswer);
+            }
+                                       //console.log(' --- ');
+                                       //push wrong answers to array.
+            var wrongAnswer1 = correctAnswer + Math.floor(Math.random()*199) - 99;
+               answerArray.push({      //create a wrong answer object in the answer array. see answerArray notes above
+                  correct: false,
+                  value: wrongAnswer1
+               });
+            var wrongAnswer2 = correctAnswer - Math.floor(Math.random()*199) - 99;
+               answerArray.push({
+                  correct: false,
+                  value: wrongAnswer2
+               });
+            var wrongAnswer3 = Math.floor(Math.random()*199) - 99;
+               answerArray.push({
+                  correct: false,
+                  value: wrongAnswer3
+                });
+                                       //console.log('Incorrect answer 1: ' + wrongAnswer1);
+                                       //console.log('Incorrect answer 2: ' + wrongAnswer2);
+                                       //console.log('Incorrect answer 3: ' + wrongAnswer3);
+                                       //console.log(' --- ');
+
+         // answerArray now has four object elements with the correct answer object being at position zero.
+         // let's build a new array of objects out of the answer Array objects but in a random order.
+         // we loop through the answer array and choose a random index.
+
+            while(answerArray.length !== 0) {
+               let randomIndex = Math.floor(Math.random() * answerArray.length);
+               randomizedAnswers.push(answerArray[randomIndex]);   //we "push" or add that object at the random index to the randomizedAnswers array.
+               answerArray.splice(randomIndex, 1); //then we remove the object from the answerArray so it won't get chosen again by "spicing" or removing at  the start of randomIndex and the delete position  of 1 or the first element at the start.
+               //we loop through again and choose another randomIndex, subtracting the number of object elements each time and building the new randomized Array until the while loop sees that the length of the array is 0
+            }
+           // here we loop through the randomizedAnswers array and build our HTML buttons and set a variable with the correct letter answer.
+            for (var i = 0; i < randomizedAnswers.length; i++) {
+                                       //console.log('Correct? ' + randomizedAnswers[i].correct + ', Value: ' + randomizedAnswers[i].value);
+             //  answerString = answerString + letterAnswers[i] + ' ' + randomizedAnswers[i].value + '<br>'; //used for testing
+               button = button + '<button id="button' + letterAnswers[i] + '" value="' + letterAnswers[i] + '" >' + letterAnswers[i] + ': ' + randomizedAnswers[i].value + '</button><br><br>' ;
+
+               //while looping through the array of objects, check to see if any of the object "correct" elements is true. if so, record the letter in the letterAnswers array at the current position we're at in the randomizedAnswers array.
+               if (randomizedAnswers[i].correct) {
+                  correctLetterAnswer = letterAnswers[i] ;
+               }
+            }
+
+                                       //console.log("BUTTON STRING:" + button);
+           // insert the button html into the answerElement element on the web page.
+            answerElement.innerHTML = button;
+
+            // let's build some event listeners so we know when a button is clikced and which one.
+            //out correctLetterAnswer var above contains the letter of the correct answer so let's create four vars with those values.
+
+            var buttonA = 'A';
+            var buttonB = 'B';
+            var buttonC = 'C';
+            var buttonD = 'D';
+
+            //listen to the web page for a button click event on any of the four buttons and when it happens, call the evaluate function below and pass it the value of the corresponding button variable
+            //see evaluate function below
+            var buttonAClick = document.getElementById("buttonA");
+            buttonAClick.addEventListener('click', function(){
+               evaluate(buttonA);
+            });
+            var buttonBClick = document.getElementById("buttonB");
+            buttonBClick.addEventListener('click', function(){
+               evaluate(buttonB);
+            });
+            var buttonCClick = document.getElementById("buttonC");
+            buttonCClick.addEventListener('click', function(){
+               evaluate(buttonC);
+            });
+            var buttonDClick = document.getElementById("buttonD");
+            buttonDClick.addEventListener('click', function(){
+               evaluate(buttonD);
+            });
+                                       //console.log(answerString);
+           //let's create some html to display the question. We set the problemString var above when we randomly-selected a problem type.
+            var questionBox = document.getElementById('question') ;
+            questionBox.innerHTML = '<p>Question: ' + problemString + '</p>';
+
+         // Let's keep score. scoreRight and scoreWrong are set to 0 at the top of the file and are incremented in the evaluate function below.
+            scoreKeeper.innerHTML = '<p>SCORE -- Correct: ' + scoreRight + ' | Wrong: ' + scoreWrong + '</p>';
+         }
+
+         ///////////////////////
+         // on first page load, let's generate a problem automatically.
+
+         answerElement.innerHTML = '';
+         document.onload = generateProblem();
+
+         //Let's evaluate the button clicks by checking if the value fed to the function above in the listener code matches the correctLetterAnswer we set.
+         //if it does, we display an alert "Correct," add 1 to the scoreRight, and spawn a new question.
+         //If it's wrong, we display a different alert showing the correct answer, add 1 to the wrong answeer var and generate a new question.
+
+         function evaluate(x){
+                                       //console.log("EVALUATE");
+            if (x === correctLetterAnswer){
+                                       //console.log('Corretco!');
+               alert("Correct");
+               answerElement.innerHTML = '';
+               scoreRight = scoreRight + 1;
+               generateProblem();
+            } else {
+               alert("Wrong. The correct answer is " + correctLetterAnswer + ': ' + correctAnswer);
+               answerElement.innerHTML = '';
+               scoreWrong = scoreWrong + 1;
+               generateProblem();
+            }
+         };
+
+   </script>
+</body>
+</html>
